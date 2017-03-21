@@ -24,7 +24,7 @@ Após fazer isso: Extensões -> Modificações -> Atualizar.
 Na área administrativa:
 ![Print 1](http://i.imgur.com/XnoOvWD.png)
 
-Na página produto:
+Na página do produto:
 
 ![Print 2](http://i.imgur.com/fdxtsdA.png)
 
