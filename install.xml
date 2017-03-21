@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+<name>Tabela de medidas por produtos</name>
+	<code>Tabela de medidas por produtos</code>
+	<version>1.0</version>
+	<author>Fernando Moraes</author>
+	<link>http://www.fermoraes.com.br</link>
+
+	<!-- admin -->
+	<file path="admin/controller/catalog/product.php">
+		<operation>
+			<search><![CDATA[$this->load->model('tool/image');]]></search>
+			<add position="before"><![CDATA[
+
+				if (isset($this->request->post['imageTabela'])) {
+					$data['imageTabela'] = $this->request->post['imageTabela'];
+				} 
+				elseif (!empty($product_info)) {
+					$data['imageTabela'] = $product_info['imageTabela'];
+				} 
+				else {
+					$data['imageTabela'] = '';
+				}
+
+			]]></add>
+		</operation>    
+		<operation>
+			<search><![CDATA[$this->load->model('tool/image');]]></search>
+			<add position="after"><![CDATA[
+				
+				if (isset($this->request->post['imageTabela']) && is_file(DIR_IMAGE . $this->request->post['imageTabela'])) {
+					$data['thumbTabela'] = $this->model_tool_image->resize($this->request->post['imageTabela'], 100, 100);
+				} 
+				elseif (!empty($product_info) && is_file(DIR_IMAGE . $product_info['imageTabela'])) {
+					$data['thumbTabela'] = $this->model_tool_image->resize($product_info['imageTabela'], 100, 100);
+				} 
+				else {
+					$data['thumbTabela'] = $this->model_tool_image->resize('no_image.png', 100, 100);
+				}
+
+			]]></add>
+		</operation>   
+	</file>
+
+	<file path="admin/model/catalog/product.php">   
+		<operation>
+			<search><![CDATA[$product_id = $this->db->getLastId();]]></search>
+			<add position="after"><![CDATA[
+
+				if (isset($data['imageTabela'])) {
+					$this->db->query("UPDATE " . DB_PREFIX . "product SET imageTabela = '" . $this->db->escape($data['imageTabela']) . "' WHERE product_id = '" . (int)$product_id . "'");
+				}
+				
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[$this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");]]></search>
+			<add position="before"><![CDATA[
+
+				if (isset($data['imageTabela'])) {
+					$this->db->query("UPDATE " . DB_PREFIX . "product SET imageTabela = '" . $this->db->escape($data['imageTabela']) . "' WHERE product_id = '" . (int)$product_id . "'");
+				}
+				
+			]]></add>
+		</operation>    
+	</file>
+
+	<file path="admin/view/template/catalog/product_form.tpl">
+		<operation>
+			<search><![CDATA[<li><a href="#tab-design" data-toggle="tab"><?php echo $tab_design; ?></a></li>]]></search>
+			<add position="after"><![CDATA[
+
+				<li><a href="#tab-medidas" data-toggle="tab">Tabela de medidas</a></li>
+				
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[<div class="tab-pane active" id="tab-general">]]></search>
+			<add position="before"><![CDATA[
+
+				<div class="tab-pane" id="tab-medidas">
+					<div class="table-responsive">
+						<table class="table table-bordered table-hover">
+							<thead>
+								<tr>
+									<td class="text-left">Tabela</td>
+									<td class="text-left">Imagem</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="text-left">Medidas</td>
+									<td class="text-left">
+										<a href="" id="thumb-imageTabela" data-toggle="image" class="img-thumbnail">
+											<img src="<?php echo $thumbTabela; ?>" data-placeholder="<?php echo $placeholder; ?>" />
+										</a>
+										<input type="hidden" name="imageTabela" value="<?php echo $imageTabela; ?>" id="input-imageTabela" />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				
+			]]></add>
+		</operation>    
+	</file>
+
+	<!-- catalog -->
+	<file path="catalog/model/catalog/product.php">
+		<operation>
+			<search><![CDATA[$query->row['image'],]]></search>
+			<add position="after"><![CDATA[
+				'imageTabela' => $query->row['imageTabela'],
+			]]></add>
+		</operation>    
+	</file>
+		
+    <file path="catalog/controller/product/product.php">
+        <operation> 
+		<search trim="true"><![CDATA[$this->load->model('tool/image');]]></search>
+            <add position="after"><![CDATA[
+
+				if ($product_info['imageTabela']) {
+					$data['imageTabela'] = HTTP_SERVER . 'image/' . $product_info['imageTabela'];
+				} else {
+					$data['imageTabela'] = '';
+				}
+			
+            ]]></add>
+        </operation>
+    </file>
+	
+    <file path="catalog/view/theme/*/template/product/product.tpl">	
+        <operation> 
+		 	<search trim="true"><![CDATA[<div id="product">]]></search>
+            <add position="after"><![CDATA[
+				
+				<?php if($imageTabela != ""){ ?>
+
+					<div class="form-group">
+						<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalTabela">
+					  		Visualizar medidas
+						</button>
+					</div>
+
+					<div class="modal fade bd-example-modal-lg" id="modalTabela" tabindex="-1" role="dialog" aria-hidden="true">
+					  	<div class="modal-dialog modal-lg" role="document">
+						    <div class="modal-content">
+						      	<div class="modal-header">
+						        	<h5 class="modal-title">Tabela de medidas</h5>
+						      	</div>
+
+						      	<div class="modal-body">
+						        	<img src="<?= $imageTabela; ?>" alt="Tabela de medidas" width="100%">
+						      	</div>
+
+						      	<div class="modal-footer">
+						        	<button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+					      		</div>
+
+						    </div>
+					  	</div>
+					</div>
+
+				<?php } ?>
+            
+            ]]></add>
+        </operation>		
+    </file>
+</modification>

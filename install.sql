@@ -1,0 +1,1 @@
+ALTER TABLE `oc_product` ADD `imageTabela` VARCHAR(255) NOT NULL AFTER `image`;
