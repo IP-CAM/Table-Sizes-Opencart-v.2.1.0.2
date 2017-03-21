@@ -8,7 +8,7 @@ Na área administrativa da loja: Extensões -> Instalador -> Upload do arquivo (
 
 Após fazer isso: Extensões -> Modificações -> Atualizar.
 
-## Arquivos modificados
+## Arquivos "modificados" (nada é removido, apenas adicionado)
 
 - admin/controller/catalog/product.php
 - admin/model/catalog/product.php
@@ -19,7 +19,7 @@ Após fazer isso: Extensões -> Modificações -> Atualizar.
 - Tabela oc_product, adicionado mais um campo: imageTabela
 
 
-## Screenshoots
+## Screenshots
 
 ![Print 1](http://i.imgur.com/XnoOvWD.png)
 ![Print 2](http://i.imgur.com/fdxtsdA.png)
